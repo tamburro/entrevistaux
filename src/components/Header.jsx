@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Trophy, Globe } from 'lucide-react'
+import { Trophy } from 'lucide-react'
 import { calculateLevel, xpProgress, xpForNextLevel } from '../data/gamification'
 import { useLang } from '../contexts/LanguageContext'
 import { useT } from '../data/translations'
@@ -22,11 +22,16 @@ export default function Header({ stats }) {
         <div className="flex items-center gap-4">
           <button
             onClick={toggleLang}
-            className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-200 transition-colors bg-gray-800/50 px-2.5 py-1.5 rounded-lg"
+            className="relative flex items-center w-16 h-7 bg-gray-800 rounded-full p-0.5 cursor-pointer transition-colors"
             title="Toggle language"
           >
-            <Globe size={14} />
-            {lang === 'en' ? 'EN' : 'PT'}
+            <span
+              className={`absolute w-7 h-6 bg-primary-600 rounded-full transition-transform duration-200 ${
+                lang === 'pt' ? 'translate-x-[calc(100%+2px)]' : 'translate-x-0'
+              }`}
+            />
+            <span className={`relative z-10 flex-1 text-center text-[10px] font-semibold transition-colors ${lang === 'en' ? 'text-white' : 'text-gray-500'}`}>EN</span>
+            <span className={`relative z-10 flex-1 text-center text-[10px] font-semibold transition-colors ${lang === 'pt' ? 'text-white' : 'text-gray-500'}`}>PT</span>
           </button>
 
           <Link to="/profile" className="flex items-center gap-3 no-underline group">

@@ -1,16 +1,57 @@
-# React + Vite
+# EntrevistaUX
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Simulador interativo de entrevistas para Product Design. Pratique entrevistas reais em inglês, com feedback de IA e gamificação.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **3 categorias**: Behavioral, Portfolio Review, Design Challenge
+- **20+ perguntas** com follow-ups contextuais
+- **Voz + Texto**: Web Speech API nativa (Chrome/Edge), fallback automático para texto
+- **Feedback com IA**: Gemini Flash (free tier) avalia respostas, dá nota e dicas de inglês
+- **Gamificação**: XP, níveis, streaks diários, 8 badges desbloqueáveis
+- **Bilíngue**: Toggle PT-BR / EN em toda interface
+- **Offline-first**: Dados persistem em localStorage
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+# Instalar dependências
+npm install
 
-## Expanding the ESLint configuration
+# Rodar em desenvolvimento
+npm run dev
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+# Build para produção
+npm run build
+```
+
+## Feedback com IA (opcional)
+
+O app funciona 100% sem IA. Para ativar o feedback inteligente:
+
+1. Acesse [Google AI Studio](https://aistudio.google.com/apikey) e gere uma chave gratuita
+2. Cole a chave no campo "Gemini API Key" na Home do app
+3. A chave fica salva no localStorage do seu navegador (nunca sai da sua máquina)
+
+**Free tier:** 15 req/min, 1.500 req/dia, 1M tokens/dia — suficiente para ~100 sessões/dia.
+
+## Stack
+
+| Tecnologia | Função |
+|---|---|
+| Vite | Build tool |
+| React 19 | UI |
+| Tailwind CSS 4 | Estilização |
+| React Router | Navegação |
+| Lucide React | Ícones |
+| Google Generative AI | Feedback com IA (opcional) |
+| Web Speech API | Reconhecimento e síntese de voz |
+
+## Deploy
+
+O projeto está configurado para deploy automático na Vercel. Cada push na `main` dispara um novo deploy.
+
+```bash
+# Deploy manual
+vercel --prod
+```
