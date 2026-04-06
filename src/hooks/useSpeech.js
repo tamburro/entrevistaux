@@ -111,9 +111,7 @@ export function useSpeech(lang = 'en') {
     
     utterance.rate = lang === 'pt' ? 1.0 : 0.9
     
-    setTimeout(() => {
-      window.speechSynthesis.speak(utterance)
-    }, 50)
+    window.speechSynthesis.speak(utterance)
   }, [selectedVoice, lang])
 
   const resetTranscript = useCallback(() => {

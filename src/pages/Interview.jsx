@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, Send, SkipForward, Volume2, VolumeOff, Loader2 } from 'lucide-react'
+import { ArrowLeft, Send, SkipForward, Volume2, VolumeOff, Loader2, RotateCcw } from 'lucide-react'
 import { categories, getRandomQuestions } from '../data/questions'
 import { getRoleById } from '../data/roles'
 import { useSpeech } from '../hooks/useSpeech'
@@ -47,18 +47,13 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
       const text = currentQuestion.question
       setMessages([{ role: 'interviewer', text }])
       setFollowUpIndex(0)
-    }
-  }, [currentIndex, currentQuestion])
-
-  useEffect(() => {
-    if (currentQuestion && autoSpeak && voices.length > 0) {
-      const text = currentQuestion.question
-      if (lastSpokenRef.current !== text) {
+      
+      if (autoSpeak && lastSpokenRef.current !== text) {
         lastSpokenRef.current = text
         speak(text)
       }
     }
-  }, [currentIndex, currentQuestion, voices.length, autoSpeak, speak])
+  }, [currentIndex, currentQuestion, autoSpeak, speak])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -240,6 +235,14 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
               className="text-gray-500 hover:text-gray-300 transition-colors"
             >
               {autoSpeak ? <Volume2 size={16} /> : <VolumeOff size={16} />}
+            </button>
+            <button
+              onClick={() => speak(currentQuestion.question)}
+              className="text-gray-500 hover:text-gray-300 text-xs flex items-center gap-1 transition-colors"
+              title={t('interview.replay') || "Repetir"}
+            >
+              <RotateCcw size={14} />
+              {lang === 'pt' ? 'Repetir' : 'Replay'}
             </button>
             <button
               onClick={skipQuestion}
