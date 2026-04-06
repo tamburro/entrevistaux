@@ -18,8 +18,8 @@ export default function Results({ stats }) {
   const [aiSummary, setAiSummary] = useState(null)
   const [aiLoading, setAiLoading] = useState(false)
 
-  const category = categories[categoryId]
-  const role = getRoleById(roleId)
+  const category = categories[lang]?.[categoryId] || categories['en'][categoryId]
+  const role = getRoleById(roleId, lang)
   const level = calculateLevel(stats.xp)
   const progress = xpProgress(stats.xp)
   const needed = xpForNextLevel(stats.xp)

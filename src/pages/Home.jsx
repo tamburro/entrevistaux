@@ -15,7 +15,8 @@ export default function Home({ stats, geminiReady, onSetApiKey }) {
   const [selectedRole, setSelectedRole] = useState(null)
   const [keyInput, setKeyInput] = useState('')
 
-  const roleTitles = roles.map((r) => r.title)
+  const currentRoles = roles[lang] || roles['en']
+  const roleTitles = currentRoles.map((r) => r.title)
 
   const handleSaveKey = (e) => {
     e.preventDefault()
@@ -25,8 +26,8 @@ export default function Home({ stats, geminiReady, onSetApiKey }) {
     }
   }
 
-  const role = selectedRole ? roles.find((r) => r.id === selectedRole) : null
-  const roleCategories = role ? getCategoriesForRole(role.categories) : []
+  const role = selectedRole ? currentRoles.find((r) => r.id === selectedRole) : null
+  const roleCategories = role ? getCategoriesForRole(role.categories, lang) : []
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
@@ -45,7 +46,7 @@ export default function Home({ stats, geminiReady, onSetApiKey }) {
         <>
           <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">{t('home.choose.role')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
-            {roles.map((r) => {
+            {currentRoles.map((r) => {
               const Icon = roleIcons[r.icon]
               const completedForRole = r.categories.reduce(
                 (sum, catId) => sum + (stats.categoriesCompleted?.[`${r.id}/${catId}`] || 0),

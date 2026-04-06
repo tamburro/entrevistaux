@@ -18,11 +18,11 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
   const navigate = useNavigate()
   const { lang } = useLang()
   const t = useT(lang)
-  const category = categories[categoryId]
-  const role = getRoleById(roleId)
+  const category = categories[lang]?.[categoryId] || categories['en'][categoryId]
+  const role = getRoleById(roleId, lang)
   const compositeKey = `${roleId}/${categoryId}`
 
-  const [sessionQuestions] = useState(() => getRandomQuestions(roleId, categoryId, QUESTIONS_PER_SESSION))
+  const [sessionQuestions] = useState(() => getRandomQuestions(roleId, categoryId, QUESTIONS_PER_SESSION, lang))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [messages, setMessages] = useState([])
   const [inputValue, setInputValue] = useState('')
@@ -35,7 +35,7 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
   const chatEndRef = useRef(null)
   const inputRef = useRef(null)
 
-  const { isListening, isSupported, transcript, startListening, stopListening, speak, resetTranscript } = useSpeech()
+  const { isListening, isSupported, transcript, startListening, stopListening, speak, resetTranscript, voices, selectedVoice, setSelectedVoice } = useSpeech(lang)
 
   const currentQuestion = sessionQuestions[currentIndex]
 
@@ -206,6 +206,21 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
             <span>{category.title}</span>
           </div>
           <div className="flex items-center gap-2">
+            {voices.length > 0 && (
+              <select
+                className="bg-gray-900 border border-gray-800 text-gray-400 text-[10px] rounded px-1 py-0.5 focus:outline-none max-w-[100px] truncate"
+                value={selectedVoice?.name || ''}
+                onChange={(e) => {
+                  const voice = voices.find(v => v.name === e.target.value)
+                  if (voice) setSelectedVoice(voice)
+                }}
+                title="Select Voice"
+              >
+                {voices.map(v => (
+                  <option key={v.name} value={v.name}>{v.name}</option>
+                ))}
+              </select>
+            )}
             <button
               onClick={() => setAutoSpeak(!autoSpeak)}
               className="text-gray-500 hover:text-gray-300 transition-colors"

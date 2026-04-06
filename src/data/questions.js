@@ -1,4 +1,6 @@
-export const categories = {
+import { categories_pt, questions_pt } from './questions_pt'
+
+const categories_en = {
   behavioral: {
     id: 'behavioral',
     title: 'Behavioral',
@@ -57,13 +59,18 @@ export const categories = {
   },
 }
 
-export function getCategoriesForRole(roleCategories) {
-  return roleCategories.map((id) => categories[id]).filter(Boolean)
+export const categories = {
+  en: categories_en,
+  pt: categories_pt
+}
+
+export function getCategoriesForRole(roleCategories, lang = 'en') {
+  return roleCategories.map((id) => categories[lang][id]).filter(Boolean)
 }
 
 // ─── QUESTIONS BY ROLE AND CATEGORY ───
 
-const questions = {
+const questions_en = {
   // ─── PRODUCT DESIGNER ───
   'product-designer': {
     behavioral: [
@@ -263,10 +270,15 @@ const questions = {
   },
 }
 
-export function getRandomQuestions(roleId, categoryId, count = 5) {
-  const roleQuestions = questions[roleId]?.[categoryId]
-  if (!roleQuestions) return []
-  const pool = [...roleQuestions]
+export const questions = {
+  en: questions_en,
+  pt: questions_pt
+}
+
+export function getRandomQuestions(roleId, categoryId, count = 5, lang = 'en') {
+  const roleQuestionsList = questions[lang]?.[roleId]?.[categoryId] || questions['en']?.[roleId]?.[categoryId]
+  if (!roleQuestionsList) return []
+  const pool = [...roleQuestionsList]
   const selected = []
   while (selected.length < count && pool.length > 0) {
     const idx = Math.floor(Math.random() * pool.length)

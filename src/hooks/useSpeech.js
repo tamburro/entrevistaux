@@ -2,11 +2,41 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 
-export function useSpeech() {
+export function useSpeech(lang = 'en') {
   const [isListening, setIsListening] = useState(false)
   const [isSupported] = useState(() => !!SpeechRecognition)
   const [transcript, setTranscript] = useState('')
+  const [voices, setVoices] = useState([])
+  const [selectedVoice, setSelectedVoice] = useState(null)
   const recognitionRef = useRef(null)
+
+  useEffect(() => {
+    const synth = window.speechSynthesis
+    if (!synth) return
+
+    const loadVoices = () => {
+      const availableVoices = synth.getVoices()
+      const langPrefix = lang === 'pt' ? 'pt' : 'en'
+      const matchedVoices = availableVoices.filter(v => v.lang.startsWith(langPrefix))
+      const sortedVoices = matchedVoices.length > 0 ? matchedVoices : availableVoices
+      setVoices(sortedVoices)
+      
+      setSelectedVoice(prev => {
+        if (prev && prev.lang.startsWith(langPrefix)) return prev
+        const preferredVoice = sortedVoices.find(v => 
+          lang === 'pt' 
+            ? v.name.includes('Luciana') || v.name.includes('Google português do Brasil') || v.name.includes('Daniel')
+            : v.name.includes('Samantha') || v.name.includes('Google US') || v.name.includes('Fiona')
+        )
+        return preferredVoice || sortedVoices[0] || null
+      })
+    }
+
+    loadVoices()
+    if (synth.onvoiceschanged !== undefined) {
+      synth.onvoiceschanged = loadVoices
+    }
+  }, [lang])
 
   useEffect(() => {
     return () => {
@@ -20,7 +50,7 @@ export function useSpeech() {
     if (!SpeechRecognition) return
 
     const recognition = new SpeechRecognition()
-    recognition.lang = 'en-US'
+    recognition.lang = lang === 'pt' ? 'pt-BR' : 'en-US'
     recognition.interimResults = true
     recognition.continuous = true
 
@@ -49,7 +79,7 @@ export function useSpeech() {
     recognition.start()
     setIsListening(true)
     setTranscript('')
-  }, [])
+  }, [lang])
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
@@ -63,10 +93,14 @@ export function useSpeech() {
     if (!window.speechSynthesis) return
     window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'en-US'
-    utterance.rate = 0.9
+    if (selectedVoice) {
+      utterance.voice = selectedVoice
+    } else {
+      utterance.lang = lang === 'pt' ? 'pt-BR' : 'en-US'
+    }
+    utterance.rate = lang === 'pt' ? 1.0 : 0.9
     window.speechSynthesis.speak(utterance)
-  }, [])
+  }, [selectedVoice, lang])
 
   const resetTranscript = useCallback(() => {
     setTranscript('')
@@ -76,6 +110,9 @@ export function useSpeech() {
     isListening,
     isSupported,
     transcript,
+    voices,
+    selectedVoice,
+    setSelectedVoice,
     startListening,
     stopListening,
     speak,

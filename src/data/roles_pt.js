@@ -1,62 +1,51 @@
-import { roles_pt } from './roles_pt'
-
-const roles_en = [
+export const roles_pt = [
   {
     id: 'product-designer',
     title: 'Product Designer',
-    description: 'End-to-end product thinking, research, and UI',
+    description: 'Pensamento de produto ponta a ponta, pesquisa e UI',
     icon: 'Layers',
     categories: ['behavioral', 'portfolio', 'design-challenge'],
   },
   {
     id: 'ux-ui-designer',
     title: 'UX/UI Designer',
-    description: 'User experience flows and interface design',
+    description: 'Fluxos de experiência do usuário e design de interface',
     icon: 'MousePointerClick',
     categories: ['behavioral', 'portfolio', 'design-challenge'],
   },
   {
     id: 'visual-designer',
     title: 'Visual Designer',
-    description: 'Brand identity, typography, and visual systems',
+    description: 'Identidade de marca, tipografia e sistemas visuais',
     icon: 'Palette',
     categories: ['behavioral', 'portfolio', 'design-challenge'],
   },
   {
     id: 'ux-researcher',
     title: 'UX Researcher',
-    description: 'User research methods, insights, and strategy',
+    description: 'Métodos de pesquisa de usuário, insights e estratégia',
     icon: 'Search',
     categories: ['behavioral', 'portfolio', 'design-challenge'],
   },
   {
     id: 'fullstack-developer',
-    title: 'Full Stack Developer',
-    description: 'Frontend, backend, APIs, and system design',
+    title: 'Desenvolvedor Full Stack',
+    description: 'Frontend, backend, APIs e design de sistemas',
     icon: 'Code',
     categories: ['behavioral', 'technical', 'system-design'],
   },
   {
     id: 'frontend-developer',
-    title: 'Frontend Developer',
-    description: 'UI implementation, performance, and accessibility',
+    title: 'Desenvolvedor Frontend',
+    description: 'Implementação de interface, performance e acessibilidade',
     icon: 'Monitor',
     categories: ['behavioral', 'technical', 'system-design'],
   },
   {
     id: 'product-manager',
     title: 'Product Manager',
-    description: 'Strategy, prioritization, and stakeholder alignment',
+    description: 'Estratégia, priorização e alinhamento de stakeholders',
     icon: 'Target',
     categories: ['behavioral', 'case-study', 'strategy'],
   },
 ]
-
-export const roles = {
-  en: roles_en,
-  pt: roles_pt
-}
-
-export function getRoleById(roleId, lang = 'en') {
-  return roles[lang].find((r) => r.id === roleId)
-}
