@@ -8,7 +8,7 @@ import Results from './pages/Results'
 import Profile from './pages/Profile'
 import { useGameStats } from './hooks/useGameStats'
 import { BADGES } from './data/gamification'
-import { initGemini, isGeminiReady } from './services/gemini'
+import { initGemini } from './services/gemini'
 
 export default function App() {
   const { stats, recordAnswer, completeInterview } = useGameStats()
@@ -33,9 +33,9 @@ export default function App() {
   }, [])
 
   const handleComplete = useCallback(
-    (categoryId) => {
+    (compositeKey) => {
       const prevBadges = [...stats.unlockedBadges]
-      completeInterview(categoryId)
+      completeInterview(compositeKey)
 
       setTimeout(() => {
         const currentStats = JSON.parse(localStorage.getItem('entrevistaux-stats') || '{}')
@@ -64,7 +64,7 @@ export default function App() {
             }
           />
           <Route
-            path="/interview/:categoryId"
+            path="/interview/:roleId/:categoryId"
             element={
               <Interview
                 onRecordAnswer={recordAnswer}

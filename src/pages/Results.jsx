@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { CheckCircle, RotateCcw, Home, Loader2 } from 'lucide-react'
 import { categories } from '../data/questions'
+import { getRoleById } from '../data/roles'
 import { calculateLevel, xpProgress, xpForNextLevel } from '../data/gamification'
 import { generateSessionSummary, isGeminiReady } from '../services/gemini'
 import { useLang } from '../contexts/LanguageContext'
@@ -12,12 +13,13 @@ export default function Results({ stats }) {
   const navigate = useNavigate()
   const { lang } = useLang()
   const t = useT(lang)
-  const { categoryId, questionsCount, sessionQuestions, sessionAnswers } = location.state || {}
+  const { roleId, categoryId, questionsCount, sessionQuestions, sessionAnswers } = location.state || {}
 
   const [aiSummary, setAiSummary] = useState(null)
   const [aiLoading, setAiLoading] = useState(false)
 
-  const category = categories.find((c) => c.id === categoryId)
+  const category = categories[categoryId]
+  const role = getRoleById(roleId)
   const level = calculateLevel(stats.xp)
   const progress = xpProgress(stats.xp)
   const needed = xpForNextLevel(stats.xp)
@@ -29,6 +31,7 @@ export default function Results({ stats }) {
         questions: sessionQuestions,
         answers: sessionAnswers,
         categoryId,
+        roleTitle: role?.title || '',
         lang,
       }).then((summary) => {
         setAiSummary(summary)
@@ -132,7 +135,7 @@ export default function Results({ stats }) {
 
       <div className="flex flex-col sm:flex-row gap-3">
         <button
-          onClick={() => navigate(`/interview/${categoryId}`)}
+          onClick={() => navigate(`/interview/${roleId}/${categoryId}`)}
           className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-primary-600 text-white font-medium hover:bg-primary-500 transition-colors"
         >
           <RotateCcw size={16} />

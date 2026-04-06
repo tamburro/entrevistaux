@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
-import { MessageCircle, Briefcase, Lightbulb } from 'lucide-react'
+import { MessageCircle, Briefcase, Lightbulb, Code, Network, FileText, Compass } from 'lucide-react'
 import { useT } from '../data/translations'
 
-const icons = { MessageCircle, Briefcase, Lightbulb }
+const icons = { MessageCircle, Briefcase, Lightbulb, Code, Network, FileText, Compass }
 
 const colorMap = {
   primary: {
@@ -28,14 +28,14 @@ const colorMap = {
   },
 }
 
-export default function CategoryCard({ category, completedCount, lang }) {
+export default function CategoryCard({ category, completedCount, lang, linkTo }) {
   const t = useT(lang)
   const Icon = icons[category.icon]
   const c = colorMap[category.color]
 
   return (
     <Link
-      to={`/interview/${category.id}`}
+      to={linkTo}
       className={`block p-6 rounded-2xl border ${c.border} ${c.hoverBorder} ${c.bg} transition-all duration-200 hover:scale-[1.02] no-underline group`}
     >
       <div className={`w-12 h-12 rounded-xl ${c.iconBg} flex items-center justify-center mb-4`}>

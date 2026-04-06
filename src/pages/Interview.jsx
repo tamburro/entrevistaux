@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Send, SkipForward, Volume2, VolumeOff, Loader2 } from 'lucide-react'
 import { categories, getRandomQuestions } from '../data/questions'
+import { getRoleById } from '../data/roles'
 import { useSpeech } from '../hooks/useSpeech'
 import { evaluateAnswer, isGeminiReady } from '../services/gemini'
 import { useLang } from '../contexts/LanguageContext'
@@ -13,13 +14,15 @@ import ProgressBar from '../components/ProgressBar'
 const QUESTIONS_PER_SESSION = 5
 
 export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
-  const { categoryId } = useParams()
+  const { roleId, categoryId } = useParams()
   const navigate = useNavigate()
   const { lang } = useLang()
   const t = useT(lang)
-  const category = categories.find((c) => c.id === categoryId)
+  const category = categories[categoryId]
+  const role = getRoleById(roleId)
+  const compositeKey = `${roleId}/${categoryId}`
 
-  const [sessionQuestions] = useState(() => getRandomQuestions(categoryId, QUESTIONS_PER_SESSION))
+  const [sessionQuestions] = useState(() => getRandomQuestions(roleId, categoryId, QUESTIONS_PER_SESSION))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [messages, setMessages] = useState([])
   const [inputValue, setInputValue] = useState('')
@@ -59,9 +62,10 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
     if (currentIndex < sessionQuestions.length - 1) {
       setCurrentIndex((i) => i + 1)
     } else {
-      onComplete(categoryId)
+      onComplete(compositeKey)
       navigate('/results', {
         state: {
+          roleId,
           categoryId,
           questionsCount: sessionQuestions.length,
           sessionQuestions: sessionQuestions.map((q) => q.question),
@@ -69,7 +73,17 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
         },
       })
     }
-  }, [currentIndex, sessionQuestions, categoryId, navigate, onComplete, sessionAnswers])
+  }, [currentIndex, sessionQuestions, compositeKey, roleId, categoryId, navigate, onComplete, sessionAnswers])
+
+  const moveToNext = useCallback(() => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'interviewer', text: t('interview.next') },
+      ])
+      setTimeout(goToNextOrFinish, 1500)
+    }, 800)
+  }, [t, goToNextOrFinish])
 
   const submitAnswer = useCallback(
     async (text) => {
@@ -92,6 +106,7 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
           question: currentQuestion.question,
           answer: answerText,
           categoryId,
+          roleTitle: role.title,
           lang,
         })
 
@@ -99,7 +114,7 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
         setIsEvaluating(false)
 
         if (evaluation) {
-          const feedbackText = `**${t('interview.score')}** ${evaluation.score}/10\n${evaluation.feedback}\n\n**${t('interview.english')}** ${evaluation.englishTip}`
+          const feedbackText = `**${t('interview.score')}** ${evaluation.score}/10\n${evaluation.feedback}\n\n**${t('interview.languageTip')}** ${evaluation.languageTip}`
           setMessages((prev) => [...prev, { role: 'feedback', text: feedbackText }])
 
           setTimeout(() => {
@@ -128,19 +143,9 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
     },
     [
       followUpIndex, currentQuestion, autoSpeak, speak, resetTranscript,
-      onRecordAnswer, usedVoiceThisAnswer, geminiReady, categoryId, lang, t, isEvaluating,
+      onRecordAnswer, usedVoiceThisAnswer, geminiReady, categoryId, lang, t, isEvaluating, moveToNext,
     ]
   )
-
-  const moveToNext = useCallback(() => {
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { role: 'interviewer', text: t('interview.next') },
-      ])
-      setTimeout(goToNextOrFinish, 1500)
-    }, 800)
-  }, [t, goToNextOrFinish])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -166,9 +171,10 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
     if (currentIndex < sessionQuestions.length - 1) {
       setCurrentIndex((i) => i + 1)
     } else {
-      onComplete(categoryId)
+      onComplete(compositeKey)
       navigate('/results', {
         state: {
+          roleId,
           categoryId,
           questionsCount: sessionQuestions.length,
           sessionQuestions: sessionQuestions.map((q) => q.question),
@@ -178,7 +184,7 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
     }
   }
 
-  if (!category) {
+  if (!category || !role) {
     navigate('/')
     return null
   }
@@ -194,8 +200,10 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
             <ArrowLeft size={16} />
             {t('interview.back')}
           </button>
-          <div className="flex-1 mx-6">
-            <ProgressBar current={currentIndex + 1} total={sessionQuestions.length} />
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <span className="text-gray-400 font-medium">{role.title}</span>
+            <span>·</span>
+            <span>{category.title}</span>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -212,6 +220,9 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
               {t('interview.skip')}
             </button>
           </div>
+        </div>
+        <div className="max-w-3xl mx-auto mt-2">
+          <ProgressBar current={currentIndex + 1} total={sessionQuestions.length} />
         </div>
       </div>
 

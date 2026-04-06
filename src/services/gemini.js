@@ -13,14 +13,20 @@ export function isGeminiReady() {
   return model !== null
 }
 
-export async function evaluateAnswer({ question, answer, categoryId, lang }) {
+export async function evaluateAnswer({ question, answer, categoryId, roleTitle, lang }) {
   if (!model) return null
 
-  const langInstruction = lang === 'pt'
-    ? 'Responda em português brasileiro.'
-    : 'Respond in English.'
+  const isEnglish = lang === 'en'
 
-  const prompt = `You are an experienced product design hiring manager evaluating an interview answer.
+  const langInstruction = isEnglish
+    ? 'Respond in English. The interview is being conducted in English.'
+    : 'Responda em português brasileiro. A entrevista está sendo conduzida em português.'
+
+  const languageTipField = isEnglish
+    ? '"languageTip": "<1 sentence about their English usage — grammar, vocabulary, or phrasing improvement>"'
+    : '"languageTip": "<1 frase sobre o uso do português — clareza, vocabulário técnico ou estrutura da frase>"'
+
+  const prompt = `You are an experienced hiring manager evaluating a mock interview answer for a ${roleTitle} position.
 
 Category: ${categoryId}
 Question: "${question}"
@@ -32,7 +38,7 @@ Evaluate the answer and return a JSON object with exactly this structure (no mar
 {
   "score": <number 1-10>,
   "feedback": "<2-3 sentences evaluating the content, structure, and depth of the answer>",
-  "englishTip": "<1 sentence about their English usage — grammar, vocabulary, or phrasing improvement. If the answer is not in English, note that>",
+  ${languageTipField},
   "followUp": "<a natural follow-up question based on their specific answer>"
 }`
 
@@ -46,7 +52,7 @@ Evaluate the answer and return a JSON object with exactly this structure (no mar
   }
 }
 
-export async function generateSessionSummary({ questions, answers, categoryId, lang }) {
+export async function generateSessionSummary({ questions, answers, categoryId, roleTitle, lang }) {
   if (!model) return null
 
   const langInstruction = lang === 'pt'
@@ -55,7 +61,7 @@ export async function generateSessionSummary({ questions, answers, categoryId, l
 
   const pairs = questions.map((q, i) => `Q: ${q}\nA: ${answers[i] || '(skipped)'}`).join('\n\n')
 
-  const prompt = `You are an experienced product design hiring manager reviewing a mock interview session.
+  const prompt = `You are an experienced hiring manager reviewing a mock interview session for a ${roleTitle} position.
 
 Category: ${categoryId}
 
