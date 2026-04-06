@@ -34,6 +34,7 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
 
   const chatEndRef = useRef(null)
   const inputRef = useRef(null)
+  const lastSpokenRef = useRef(null)
 
   const { isListening, isSupported, transcript, startListening, stopListening, speak, resetTranscript, voices, selectedVoice, setSelectedVoice } = useSpeech(lang)
 
@@ -44,9 +45,18 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
       const text = currentQuestion.question
       setMessages([{ role: 'interviewer', text }])
       setFollowUpIndex(0)
-      if (autoSpeak) speak(text)
     }
-  }, [currentIndex, currentQuestion]) // Removed autoSpeak and speak to prevent re-triggering due to voice load
+  }, [currentIndex, currentQuestion])
+
+  useEffect(() => {
+    if (currentQuestion && autoSpeak && voices.length > 0) {
+      const text = currentQuestion.question
+      if (lastSpokenRef.current !== text) {
+        lastSpokenRef.current = text
+        speak(text)
+      }
+    }
+  }, [currentIndex, currentQuestion, voices.length, autoSpeak, speak])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })

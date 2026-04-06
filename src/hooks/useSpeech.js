@@ -92,10 +92,13 @@ export function useSpeech(lang = 'en') {
 
   const speak = useCallback((text) => {
     if (!window.speechSynthesis) return
-    window.speechSynthesis.cancel()
+    
+    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+      window.speechSynthesis.cancel()
+    }
     
     const utterance = new SpeechSynthesisUtterance(text)
-    utteranceRef.current = utterance // Prevent garbage collection bug in some browsers
+    utteranceRef.current = utterance 
 
     utterance.lang = lang === 'pt' ? 'pt-BR' : 'en-US'
 
@@ -108,7 +111,9 @@ export function useSpeech(lang = 'en') {
     
     utterance.rate = lang === 'pt' ? 1.0 : 0.9
     
-    window.speechSynthesis.speak(utterance)
+    setTimeout(() => {
+      window.speechSynthesis.speak(utterance)
+    }, 50)
   }, [selectedVoice, lang])
 
   const resetTranscript = useCallback(() => {
