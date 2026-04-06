@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, Send, SkipForward, Volume2, VolumeOff, Loader2 } from 'lucide-react'
 import { categories, getRandomQuestions } from '../data/questions'
 import { getRoleById } from '../data/roles'
@@ -16,6 +16,8 @@ const QUESTIONS_PER_SESSION = 5
 export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
   const { roleId, categoryId } = useParams()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const seniority = searchParams.get('seniority') || 'pleno'
   const { lang } = useLang()
   const t = useT(lang)
   const category = categories[lang]?.[categoryId] || categories['en'][categoryId]
@@ -118,6 +120,7 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
           categoryId,
           roleTitle: role.title,
           lang,
+          seniority,
         })
 
         setMessages((prev) => prev.filter((m) => m.text !== 'evaluating'))
@@ -153,7 +156,7 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
     },
     [
       followUpIndex, currentQuestion, autoSpeak, speak, resetTranscript,
-      onRecordAnswer, usedVoiceThisAnswer, geminiReady, categoryId, lang, t, isEvaluating, moveToNext,
+      onRecordAnswer, usedVoiceThisAnswer, geminiReady, categoryId, lang, seniority, t, isEvaluating, moveToNext,
     ]
   )
 
@@ -189,6 +192,7 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
           questionsCount: sessionQuestions.length,
           sessionQuestions: sessionQuestions.map((q) => q.question),
           sessionAnswers: [...sessionAnswers, ''],
+          seniority,
         },
       })
     }

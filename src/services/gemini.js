@@ -13,7 +13,7 @@ export function isGeminiReady() {
   return model !== null
 }
 
-export async function evaluateAnswer({ question, answer, categoryId, roleTitle, lang }) {
+export async function evaluateAnswer({ question, answer, categoryId, roleTitle, lang, seniority = 'pleno' }) {
   if (!model) return null
 
   const isEnglish = lang === 'en'
@@ -26,7 +26,7 @@ export async function evaluateAnswer({ question, answer, categoryId, roleTitle, 
     ? '"languageTip": "<1 sentence about their English usage — grammar, vocabulary, or phrasing improvement>"'
     : '"languageTip": "<1 frase sobre o uso do português — clareza, vocabulário técnico ou estrutura da frase>"'
 
-  const prompt = `You are an experienced hiring manager evaluating a mock interview answer for a ${roleTitle} position.
+  const prompt = `You are an experienced hiring manager evaluating a mock interview answer for a ${seniority.toUpperCase()} ${roleTitle} position. Calibrate your expectations and harshness to a ${seniority} level.
 
 Category: ${categoryId}
 Question: "${question}"
@@ -52,7 +52,7 @@ Evaluate the answer and return a JSON object with exactly this structure (no mar
   }
 }
 
-export async function generateSessionSummary({ questions, answers, categoryId, roleTitle, lang }) {
+export async function generateSessionSummary({ questions, answers, categoryId, roleTitle, lang, seniority = 'pleno' }) {
   if (!model) return null
 
   const langInstruction = lang === 'pt'
@@ -61,7 +61,7 @@ export async function generateSessionSummary({ questions, answers, categoryId, r
 
   const pairs = questions.map((q, i) => `Q: ${q}\nA: ${answers[i] || '(skipped)'}`).join('\n\n')
 
-  const prompt = `You are an experienced hiring manager reviewing a mock interview session for a ${roleTitle} position.
+  const prompt = `You are an experienced hiring manager reviewing a mock interview session for a ${seniority.toUpperCase()} ${roleTitle} position. Provide feedback appropriate for a ${seniority} candidate.
 
 Category: ${categoryId}
 

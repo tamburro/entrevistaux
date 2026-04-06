@@ -16,7 +16,7 @@ export default function App() {
   const [geminiReady, setGeminiReady] = useState(false)
 
   useEffect(() => {
-    const key = localStorage.getItem('entrevistaux-gemini-key')
+    const key = sessionStorage.getItem('entrevistaux-gemini-key')
     if (key) {
       setGeminiReady(initGemini(key))
     }
@@ -24,10 +24,10 @@ export default function App() {
 
   const handleSetApiKey = useCallback((key) => {
     if (key) {
-      localStorage.setItem('entrevistaux-gemini-key', key)
+      sessionStorage.setItem('entrevistaux-gemini-key', key)
       setGeminiReady(initGemini(key))
     } else {
-      localStorage.removeItem('entrevistaux-gemini-key')
+      sessionStorage.removeItem('entrevistaux-gemini-key')
       setGeminiReady(false)
     }
   }, [])

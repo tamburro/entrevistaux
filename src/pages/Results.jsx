@@ -13,7 +13,7 @@ export default function Results({ stats }) {
   const navigate = useNavigate()
   const { lang } = useLang()
   const t = useT(lang)
-  const { roleId, categoryId, questionsCount, sessionQuestions, sessionAnswers } = location.state || {}
+  const { roleId, categoryId, questionsCount, sessionQuestions, sessionAnswers, seniority } = location.state || {}
 
   const [aiSummary, setAiSummary] = useState(null)
   const [aiLoading, setAiLoading] = useState(false)
@@ -33,12 +33,13 @@ export default function Results({ stats }) {
         categoryId,
         roleTitle: role?.title || '',
         lang,
+        seniority,
       }).then((summary) => {
         setAiSummary(summary)
         setAiLoading(false)
       })
     }
-  }, [categoryId, lang, sessionQuestions, sessionAnswers])
+  }, [categoryId, lang, sessionQuestions, sessionAnswers, seniority])
 
   if (!category) {
     navigate('/')

@@ -13,6 +13,7 @@ export default function Home({ stats, geminiReady, onSetApiKey }) {
   const { lang } = useLang()
   const t = useT(lang)
   const [selectedRole, setSelectedRole] = useState(null)
+  const [seniority, setSeniority] = useState('pleno')
   const [keyInput, setKeyInput] = useState('')
 
   const currentRoles = roles[lang] || roles['en']
@@ -40,6 +41,22 @@ export default function Home({ stats, geminiReady, onSetApiKey }) {
         <p className="text-gray-400 text-lg max-w-2xl mx-auto">
           {t('home.subtitle')}
         </p>
+      </div>
+
+      <div className="mb-10 flex justify-center gap-3">
+        {['junior', 'pleno', 'senior'].map(level => (
+          <button
+            key={level}
+            onClick={() => setSeniority(level)}
+            className={`px-5 py-2 rounded-full text-sm font-medium capitalize transition-all duration-200 border ${
+              seniority === level
+                ? 'bg-primary-600 border-primary-500 text-white shadow-md shadow-primary-500/20'
+                : 'bg-gray-900/50 border-gray-800 text-gray-400 hover:text-white hover:border-gray-600 hover:bg-gray-800'
+            }`}
+          >
+            {lang === 'pt' ? level : (level === 'pleno' ? 'Mid-level' : level)}
+          </button>
+        ))}
       </div>
 
       {!selectedRole ? (
@@ -94,7 +111,7 @@ export default function Home({ stats, geminiReady, onSetApiKey }) {
                 category={cat}
                 completedCount={stats.categoriesCompleted?.[`${selectedRole}/${cat.id}`] || 0}
                 lang={lang}
-                linkTo={`/interview/${selectedRole}/${cat.id}`}
+                linkTo={`/interview/${selectedRole}/${cat.id}?seniority=${seniority}`}
               />
             ))}
           </div>
@@ -126,6 +143,9 @@ export default function Home({ stats, geminiReady, onSetApiKey }) {
                 value={keyInput}
                 onChange={(e) => setKeyInput(e.target.value)}
                 placeholder={t('home.apikey.placeholder')}
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck="false"
                 className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-primary-500/50"
               />
               <button
