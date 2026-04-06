@@ -38,7 +38,7 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
   const inputRef = useRef(null)
   const lastSpokenRef = useRef(null)
 
-  const { isListening, isSupported, transcript, startListening, stopListening, speak, resetTranscript, voices, selectedVoice, setSelectedVoice } = useSpeech(lang)
+  const { isListening, isSupported, transcript, startListening, stopListening, speak, resetTranscript } = useSpeech(lang)
 
   const currentQuestion = sessionQuestions[currentIndex]
 
@@ -214,22 +214,8 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
             <span>·</span>
             <span>{category.title}</span>
           </div>
+
           <div className="flex items-center gap-2">
-            {voices.length > 0 && (
-              <select
-                className="bg-gray-900 border border-gray-800 text-gray-400 text-[10px] rounded px-1 py-0.5 focus:outline-none max-w-[100px] truncate"
-                value={selectedVoice?.name || ''}
-                onChange={(e) => {
-                  const voice = voices.find(v => v.name === e.target.value)
-                  if (voice) setSelectedVoice(voice)
-                }}
-                title="Select Voice"
-              >
-                {voices.map(v => (
-                  <option key={v.name} value={v.name}>{v.name}</option>
-                ))}
-              </select>
-            )}
             <button
               onClick={() => setAutoSpeak(!autoSpeak)}
               className="text-gray-500 hover:text-gray-300 transition-colors"

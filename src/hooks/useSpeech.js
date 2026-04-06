@@ -6,38 +6,8 @@ export function useSpeech(lang = 'en') {
   const [isListening, setIsListening] = useState(false)
   const [isSupported] = useState(() => !!SpeechRecognition)
   const [transcript, setTranscript] = useState('')
-  const [voices, setVoices] = useState([])
-  const [selectedVoice, setSelectedVoice] = useState(null)
   const recognitionRef = useRef(null)
   const utteranceRef = useRef(null)
-
-  useEffect(() => {
-    const synth = window.speechSynthesis
-    if (!synth) return
-
-    const loadVoices = () => {
-      const availableVoices = synth.getVoices()
-      const langPrefix = lang === 'pt' ? 'pt' : 'en'
-      const matchedVoices = availableVoices.filter(v => v.lang.startsWith(langPrefix))
-      const sortedVoices = matchedVoices.length > 0 ? matchedVoices : availableVoices
-      setVoices(sortedVoices)
-      
-      setSelectedVoice(prev => {
-        if (prev && prev.lang.startsWith(langPrefix)) return prev
-        const preferredVoice = sortedVoices.find(v => 
-          lang === 'pt' 
-            ? v.name.includes('Luciana') || v.name.includes('Google português do Brasil') || v.name.includes('Daniel')
-            : v.name.includes('Samantha') || v.name.includes('Google US') || v.name.includes('Fiona')
-        )
-        return preferredVoice || sortedVoices[0] || null
-      })
-    }
-
-    loadVoices()
-    if (synth.onvoiceschanged !== undefined) {
-      synth.onvoiceschanged = loadVoices
-    }
-  }, [lang])
 
   useEffect(() => {
     return () => {
@@ -101,18 +71,10 @@ export function useSpeech(lang = 'en') {
     utteranceRef.current = utterance 
 
     utterance.lang = lang === 'pt' ? 'pt-BR' : 'en-US'
-
-    if (selectedVoice) {
-      utterance.voice = selectedVoice
-      if (selectedVoice.lang) {
-        utterance.lang = selectedVoice.lang
-      }
-    }
-    
     utterance.rate = lang === 'pt' ? 1.0 : 0.9
     
     window.speechSynthesis.speak(utterance)
-  }, [selectedVoice, lang])
+  }, [lang])
 
   const resetTranscript = useCallback(() => {
     setTranscript('')
@@ -122,9 +84,6 @@ export function useSpeech(lang = 'en') {
     isListening,
     isSupported,
     transcript,
-    voices,
-    selectedVoice,
-    setSelectedVoice,
     startListening,
     stopListening,
     speak,
