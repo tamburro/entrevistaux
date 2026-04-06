@@ -46,7 +46,7 @@ export default function Interview({ onRecordAnswer, onComplete, geminiReady }) {
       setFollowUpIndex(0)
       if (autoSpeak) speak(text)
     }
-  }, [currentIndex, currentQuestion, autoSpeak, speak])
+  }, [currentIndex, currentQuestion]) // Removed autoSpeak and speak to prevent re-triggering due to voice load
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
