@@ -9,6 +9,7 @@ export function useSpeech(lang = 'en') {
   const [voices, setVoices] = useState([])
   const [selectedVoice, setSelectedVoice] = useState(null)
   const recognitionRef = useRef(null)
+  const utteranceRef = useRef(null)
 
   useEffect(() => {
     const synth = window.speechSynthesis
@@ -92,13 +93,21 @@ export function useSpeech(lang = 'en') {
   const speak = useCallback((text) => {
     if (!window.speechSynthesis) return
     window.speechSynthesis.cancel()
+    
     const utterance = new SpeechSynthesisUtterance(text)
+    utteranceRef.current = utterance // Prevent garbage collection bug in some browsers
+
+    utterance.lang = lang === 'pt' ? 'pt-BR' : 'en-US'
+
     if (selectedVoice) {
       utterance.voice = selectedVoice
-    } else {
-      utterance.lang = lang === 'pt' ? 'pt-BR' : 'en-US'
+      if (selectedVoice.lang) {
+        utterance.lang = selectedVoice.lang
+      }
     }
+    
     utterance.rate = lang === 'pt' ? 1.0 : 0.9
+    
     window.speechSynthesis.speak(utterance)
   }, [selectedVoice, lang])
 
